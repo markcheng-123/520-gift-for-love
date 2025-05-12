@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>❤️ 给小小婷的520心动宇宙 ❤️</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    canvas#bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -2;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 2rem;
+      color: #ff99cc;
+      text-shadow: 0 0 15px #ff33cc;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes glow {
+      from { text-shadow: 0 0 5px #ff33cc; }
+      to { text-shadow: 0 0 20px #ff99cc; }
+    }
+
+    .typewriter {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 10px;
+      color: #ffddee;
+      text-shadow: 0 0 8px #ff99cc;
+      min-height: 20px;
+    }
+
+    .heart-container {
+      position: relative;
+      width: 100vw;
+      max-width: 600px;
+      aspect-ratio: 1/1;
+      margin: 20px auto;
+    }
+
+    .heart-pixel {
+      position: absolute;
+      border-radius: 8px;
+      object-fit: cover;
+      box-shadow: 0 0 8px rgba(255, 105, 180, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s;
+      cursor: pointer;
+      animation: fadein 1s ease both;
+    }
+
+    @keyframes fadein {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .heart-pixel:hover {
+      transform: scale(1.4);
+      z-index: 10;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+    }
+
+    .fullscreen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      width: 100vw;
+      height: 100vh;
+      object-fit: contain;
+      transform: translate(-50%, -50%);
+      z-index: 999;
+      animation: zoomIn 0.5s ease forwards;
+      background: rgba(0, 0, 0, 0.9);
+      border-radius: 0;
+    }
+
+    @keyframes zoomIn {
+      from { transform: translate(-50%, -50%) scale(0.2); opacity: 0; }
+      to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+
+    .bubble {
+      position: absolute;
+      font-size: 18px;
+      animation: float 1.5s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-100px); opacity: 0; }
+    }
+
+    audio { display: none; }
+  </style>
+</head>
+<body>
+  <canvas id="bg"></canvas>
+  <h1>❤️ 我的小小婷，520快乐 ❤️</h1>
+  <div class="typewriter" id="typewriter"></div>
+  <div class="heart-container" id="heart"></div>
+  <audio id="bgm" autoplay loop>
+    <source src="music.mp3" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    const stars = Array.from({length: 100}, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.5 + 0.5,
+      dx: Math.random() * 0.3,
+    }));
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let s of stars) {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = "#fff";
+        ctx.fill();
+        s.x += s.dx;
+        if (s.x > canvas.width) s.x = 0;
+      }
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    const heart = document.getElementById('heart');
+    const photoCount = 49;
+    const maxRepeat = 3;
+    let photoSize = 20;
+
+    function heartEquation(x, y) {
+      x = (x - 0.5) * 2;
+      y = (0.5 - y) * 2;
+      const a = x * x + y * y - 0.3;
+      return a * a * a - x * x * y * y * y < 0;
+    }
+
+    function generateHeart() {
+      while (true) {
+        heart.innerHTML = '';
+        const cols = Math.floor(heart.clientWidth / photoSize);
+        const rows = Math.floor(heart.clientHeight / photoSize);
+        let positions = [];
+
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            const nx = x / cols;
+            const ny = y / rows;
+            if (heartEquation(nx, ny)) {
+              positions.push({x, y});
+            }
+          }
+        }
+
+        if (positions.length <= photoCount * maxRepeat) {
+          const total = positions.length;
+          let pool = [];
+          for (let i = 0; i < total; i++) {
+            pool.push((i % photoCount) + 1);
+          }
+          pool = pool.sort(() => Math.random() - 0.5);
+          positions.forEach((pos, i) => {
+            const img = document.createElement('img');
+            img.src = `images/photo (${pool[i]}).jpg`;
+            img.className = 'heart-pixel';
+            img.style.left = pos.x * photoSize + 'px';
+            img.style.top = pos.y * photoSize + 'px';
+            img.style.width = photoSize + 'px';
+            img.style.height = photoSize + 'px';
+            img.addEventListener('click', () => showFull(img.src));
+            heart.appendChild(img);
+          });
+          break;
+        } else {
+          photoSize += 1;
+        }
+      }
+    }
+
+    generateHeart();
+
+    // 点击冒泡粒子 & 音乐
+    document.body.addEventListener("click", (e) => {
+      document.getElementById('bgm').play();
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.innerText = "💖";
+      bubble.style.left = e.pageX + "px";
+      bubble.style.top = e.pageY + "px";
+      bubble.style.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 1500);
+    });
+
+    // 打字效果
+    const texts = [
+      "我是你的臭笨猪。",
+      "你笑的那一刻，整个宇宙都亮了。",
+      "小小婷，你是我写不完的情书。",
+      "我希望把我的每一个520，都交给你,我这个人,还有我的坤坤,都属于你。"
+    ];
+    let typeIndex = 0, charIndex = 0;
+    const typewriter = document.getElementById('typewriter');
+    function typeEffect() {
+      if (charIndex <= texts[typeIndex].length) {
+        typewriter.innerHTML = texts[typeIndex].substring(0, charIndex++);
+        setTimeout(typeEffect, 100);
+      } else {
+        setTimeout(() => {
+          charIndex = 0;
+          typeIndex = (typeIndex + 1) % texts.length;
+          typeEffect();
+        }, 2000);
+      }
+    }
+    typeEffect();
+
+    // 放大全屏查看照片
+    function showFull(src) {
+      const fullscreenImg = document.createElement('img');
+      fullscreenImg.src = src;
+      fullscreenImg.className = 'fullscreen';
+      document.body.appendChild(fullscreenImg);
+      fullscreenImg.addEventListener('click', () => fullscreenImg.remove());
+    }
+  </script>
+</body>
+</html>
